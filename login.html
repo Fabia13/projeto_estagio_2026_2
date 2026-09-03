@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso administrativo — ESF Saude e o que Interessa</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/painel.css">
+</head>
+<body class="auth-body">
+
+  <main class="auth-wrap">
+    <div class="auth-card">
+      <p class="auth-brand">ESF Saude e o que Interessa</p>
+      <h1 class="auth-title">Acesso administrativo</h1>
+      <p class="auth-subtitle">Entre com sua conta de equipe para ver os agendamentos.</p>
+
+      <form id="form-login" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="button button-primary" id="btn-login">
+          <span class="btn-label">Entrar</span>
+        </button>
+
+        <p class="form-feedback" id="login-feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <a class="auth-back" href="index.html">&larr; Voltar para a página pública</a>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

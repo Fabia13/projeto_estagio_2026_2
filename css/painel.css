@@ -1,0 +1,215 @@
+/* ============================================
+   Estilos da área administrativa (login + painel)
+   ============================================ */
+
+/* ---------- Tela de login ---------- */
+
+.auth-body {
+  background: var(--color-teal-dark);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.auth-wrap {
+  width: 100%;
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 40px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-brand {
+  font-family: var(--font-display);
+  color: var(--color-teal);
+  font-weight: 600;
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+}
+
+.auth-title {
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+#btn-login {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.auth-back {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+/* ---------- Painel administrativo ---------- */
+
+.painel-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 18px 0;
+}
+
+.painel-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.painel-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-teal-dark);
+  font-size: 1.1rem;
+}
+
+.painel-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}
+
+.link-sair {
+  background: none;
+  border: none;
+  color: var(--color-red);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+.painel-main {
+  padding: 40px 0 64px;
+}
+
+.painel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.painel-toolbar h1 {
+  margin: 0;
+}
+
+.filtro-tipo {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-ink);
+}
+
+/* Tabela de registros */
+
+.tabela-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+table.registros {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+table.registros th {
+  text-align: left;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-ink-soft);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+table.registros td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+table.registros tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.registros tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-pendente {
+  background: #F6E6D3;
+  color: #8A5417;
+}
+
+.badge-confirmado {
+  background: #DCEAE4;
+  color: var(--color-teal-dark);
+}
+
+.badge-cancelado {
+  background: #F3DBD4;
+  color: var(--color-red);
+}
+
+.status-select {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  background: #fff;
+}
+
+/* Estado vazio e de carregamento */
+
+.painel-estado {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--color-ink-soft);
+}
+
+.painel-estado h2 {
+  color: var(--color-teal-dark);
+  margin-bottom: 8px;
+}
+
+@media (max-width: 720px) {
+  .painel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

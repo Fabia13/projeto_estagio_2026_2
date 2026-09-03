@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de agendamentos — ESF Saude  e o que interessa</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/painel.css">
+</head>
+<body>
+
+  <header class="painel-header">
+    <div class="wrap painel-header-inner">
+      <span class="painel-title">Painel — ESF Saude e o Interessa</span>
+      <div class="painel-user">
+        <span id="usuario-email"></span>
+        <button type="button" class="link-sair" id="btn-sair">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="painel-main">
+    <div class="wrap">
+      <div class="painel-toolbar">
+        <h1>Agendamentos</h1>
+        <select id="filtro-tipo" class="filtro-tipo">
+          <option value="">Todos os tipos</option>
+          <option value="consulta_medica">Consulta médica</option>
+          <option value="pre_natal">Pré-natal</option>
+          <option value="vacinacao">Vacinação</option>
+          <option value="puericultura">Puericultura</option>
+          <option value="visita_domiciliar">Visita domiciliar</option>
+        </select>
+      </div>
+
+      <!-- Estado de carregamento -->
+      <div class="painel-estado" id="estado-carregando">
+        <p>Carregando agendamentos...</p>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="painel-estado" id="estado-vazio" hidden>
+        <h2>Nenhum agendamento ainda</h2>
+        <p>Assim que alguém enviar uma solicitação pela página pública, ela aparece aqui.</p>
+      </div>
+
+      <!-- Estado de erro -->
+      <div class="painel-estado" id="estado-erro" hidden>
+        <h2>Não foi possível carregar</h2>
+        <p id="estado-erro-mensagem">Tente recarregar a página em instantes.</p>
+      </div>
+
+      <!-- Tabela de registros -->
+      <div class="tabela-wrap" id="tabela-wrap" hidden>
+        <table class="registros">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Tipo</th>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-corpo">
+            <!-- Linhas inseridas via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/painel.js"></script>
+</body>
+</html>

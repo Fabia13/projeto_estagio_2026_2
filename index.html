@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESF Saude e o que Interessa — Agende seu atendimento</title>
+  <meta name="description" content="Agende consulta, pré-natal, vacina, puericultura ou visita domiciliar na ESF Saude e o que Interessa.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <span class="brand">ESF Saude e o que Interessa</span>
+      <nav class="site-nav">
+        <a href="#servicos">Serviços</a>
+        <a href="#agendar" class="nav-cta">Agendar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1>Agende seu atendimento na Unidade de Saúde da Família</h1>
+          <p class="lede">Consulta, pré-natal, vacina, puericultura ou visita domiciliar — escolha o que você precisa e a nossa equipe confirma o horário com você.</p>
+          <a href="#agendar" class="button button-primary">Agendar atendimento</a>
+        </div>
+
+        <aside class="hero-panel" aria-label="Serviços disponíveis">
+          <p class="hero-panel-label">O que você pode agendar</p>
+          <ul class="service-chip-list">
+            <li><span class="chip-dot" data-tipo="consulta_medica"></span>Consulta médica</li>
+            <li><span class="chip-dot" data-tipo="pre_natal"></span>Pré-natal</li>
+            <li><span class="chip-dot" data-tipo="vacinacao"></span>Vacinação</li>
+            <li><span class="chip-dot" data-tipo="puericultura"></span>Puericultura</li>
+            <li><span class="chip-dot" data-tipo="visita_domiciliar"></span>Visita domiciliar</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="info-strip">
+      <div class="wrap info-grid">
+        <div class="info-item">
+          <span class="info-label">Endereço</span>
+          <p>Rua Francelino Queiroz, SN — Bairro Centro</p>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Horário de funcionamento</span>
+          <p>Segunda a sexta, das 7h às 17h</p>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Telefone</span>
+          <p>(38) 3221-4455</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="services" id="servicos">
+      <div class="wrap">
+        <h2>Nossos serviços</h2>
+
+        <div class="service-list">
+          <article class="service-row" style="--service-accent: var(--color-teal)">
+            <h3>Consulta médica</h3>
+            <p>Atendimento clínico geral com o médico da equipe, para queixas, acompanhamento e renovação de receitas.</p>
+          </article>
+
+          <article class="service-row" style="--service-accent: var(--color-blue)">
+            <h3>Pré-natal</h3>
+            <p>Acompanhamento da gestação em todas as fases, com a equipe de enfermagem e medicina da família.</p>
+          </article>
+
+          <article class="service-row" style="--service-accent: var(--color-ochre)">
+            <h3>Vacinação</h3>
+            <p>Aplicação de vacinas do calendário nacional, para todas as idades.</p>
+          </article>
+
+          <article class="service-row" style="--service-accent: var(--color-teal)">
+            <h3>Puericultura</h3>
+            <p>Acompanhamento do crescimento e desenvolvimento de crianças de 0 a 2 anos.</p>
+          </article>
+
+          <article class="service-row" style="--service-accent: var(--color-blue)">
+            <h3>Visita domiciliar</h3>
+            <p>Visita da equipe na sua casa, para quem tem dificuldade de locomoção até a unidade.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="agendar" id="agendar">
+      <div class="wrap">
+        <h2>Solicitar agendamento</h2>
+        <p class="section-lede">Preencha os dados abaixo. Sua solicitação fica com status pendente até a equipe confirmar o horário.</p>
+
+        <form id="form-agendamento" novalidate>
+          <div class="field">
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" name="nome" autocomplete="name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+          </div>
+
+          <div class="field">
+            <label for="tipo">Tipo de atendimento</label>
+            <select id="tipo" name="tipo" required>
+              <option value="" disabled selected>Selecione um tipo</option>
+              <option value="consulta_medica">Consulta médica</option>
+              <option value="pre_natal">Pré-natal</option>
+              <option value="vacinacao">Vacinação</option>
+              <option value="puericultura">Puericultura</option>
+              <option value="visita_domiciliar">Visita domiciliar</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="data">Data desejada</label>
+              <input type="date" id="data" name="data" required>
+            </div>
+            <div class="field">
+              <label for="horario">Horário</label>
+              <input type="time" id="horario" name="horario" required>
+            </div>
+          </div>
+
+          <button type="submit" class="button button-primary" id="btn-enviar">
+            <span class="btn-label">Enviar solicitação</span>
+          </button>
+
+          <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="confirmation" id="confirmation" hidden>
+          <h3>Solicitação enviada</h3>
+          <p id="confirmation-details"></p>
+          <p class="confirmation-note">Fica com status pendente até a equipe confirmar o horário com você.</p>
+          <button type="button" class="button button-ghost" id="btn-novo">Fazer outro agendamento</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>ESF Saude e o que Interessa — projeto fictício, criado como teste técnico.</p>
+      <a href="login.html">Acesso administrativo</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
