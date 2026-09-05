@@ -10,6 +10,66 @@ const TIPO_LABELS = {
   visita_domiciliar: "Visita domiciliar",
 };
 
+// Dias da semana no padrão do JavaScript: 0 = domingo, 1 = segunda, ...
+// 6 = sábado. "janelas" são intervalos [início, fim) em que o horário
+// escolhido precisa cair.
+const REGRAS_ATENDIMENTO = {
+  consulta_medica: {
+    dias: [1, 2, 3],
+    janelas: [["07:00", "11:00"], ["13:00", "17:00"]],
+    descricao: "segunda a quarta, das 7h às 11h e das 13h às 17h",
+  },
+  pre_natal: {
+    dias: [4],
+    janelas: [["07:00", "11:00"], ["13:00", "17:00"]],
+    descricao: "quinta-feira, das 7h às 11h e das 13h às 17h",
+  },
+  vacinacao: {
+    dias: [1, 2, 3, 4, 5],
+    janelas: [["07:00", "17:00"]],
+    descricao: "segunda a sexta, das 7h às 17h",
+  },
+  puericultura: {
+    dias: [2, 4],
+    janelas: [["07:00", "11:00"], ["13:00", "17:00"]],
+    descricao: "terça e quinta-feira, das 7h às 11h e das 13h às 17h",
+  },
+  visita_domiciliar: {
+    dias: [5],
+    janelas: [["08:00", "13:00"]],
+    descricao: "sexta-feira, das 8h às 13h",
+  },
+};
+
+// Constrói a data em horário local (evita o problema de "new Date('2026-09-09')"
+// interpretar como UTC e voltar um dia em fusos como o do Brasil).
+function diaDaSemana(dataIso) {
+  const [ano, mes, dia] = dataIso.split("-").map(Number);
+  return new Date(ano, mes - 1, dia).getDay();
+}
+
+function horarioDentroDaJanela(horario, janelas) {
+  return janelas.some(([inicio, fim]) => horario >= inicio && horario < fim);
+}
+
+function validarRegraAtendimento(tipo, dataIso, horario) {
+  const regra = REGRAS_ATENDIMENTO[tipo];
+  if (!regra) return { valido: true };
+
+  const dia = diaDaSemana(dataIso);
+  const diaValido = regra.dias.includes(dia);
+  const horarioValido = horarioDentroDaJanela(horario, regra.janelas);
+
+  if (!diaValido || !horarioValido) {
+    return {
+      valido: false,
+      mensagem: `${TIPO_LABELS[tipo]} atende ${regra.descricao}. Escolha um dia e horário dentro desse período.`,
+    };
+  }
+
+  return { valido: true };
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("form-agendamento");
   const feedback = document.getElementById("form-feedback");
@@ -18,10 +78,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnEnviar = document.getElementById("btn-enviar");
   const btnNovo = document.getElementById("btn-novo");
   const dataInput = document.getElementById("data");
+  const tipoSelect = document.getElementById("tipo");
+  const horarioInfo = document.getElementById("horario-info");
 
   // Não deixa escolher uma data no passado.
   const hoje = new Date().toISOString().split("T")[0];
   dataInput.setAttribute("min", hoje);
+
+  // Mostra o horário de funcionamento assim que a pessoa escolhe o tipo.
+  tipoSelect.addEventListener("change", () => {
+    const regra = REGRAS_ATENDIMENTO[tipoSelect.value];
+    horarioInfo.textContent = regra
+      ? `Atendemos ${regra.descricao}.`
+      : "";
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -37,6 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!dados.nome || !dados.email || !dados.tipo || !dados.data || !dados.horario) {
       mostrarErro("Preencha todos os campos antes de enviar.");
+      return;
+    }
+
+    const regraCheck = validarRegraAtendimento(dados.tipo, dados.data, dados.horario);
+    if (!regraCheck.valido) {
+      mostrarErro(regraCheck.mensagem);
       return;
     }
 

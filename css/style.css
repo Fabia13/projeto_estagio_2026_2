@@ -1,5 +1,5 @@
 /* ============================================
-   ESF Saude e o que Interessa 
+   ESF Nova Esperança — estilos
    ============================================ */
 
 :root {
@@ -263,6 +263,13 @@ select:focus-visible {
   margin: 0;
 }
 
+.service-row .service-horario {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-teal-dark);
+}
+
 /* ---------- Form ---------- */
 
 .agendar {
@@ -297,6 +304,13 @@ label {
   font-size: 0.9rem;
   margin-bottom: 6px;
   color: var(--color-ink);
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+  max-width: none;
 }
 
 input, select {

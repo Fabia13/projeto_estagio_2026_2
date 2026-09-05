@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESF Saude e o que Interessa — Agende seu atendimento</title>
-  <meta name="description" content="Agende consulta, pré-natal, vacina, puericultura ou visita domiciliar na ESF Saude e o que Interessa.">
+  <title>ESF Nova Esperança — Agende seu atendimento</title>
+  <meta name="description" content="Agende consulta, pré-natal, vacina, puericultura ou visita domiciliar na ESF Nova Esperança.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
 
   <header class="site-header">
     <div class="wrap header-inner">
-      <span class="brand">ESF Saude e o que Interessa</span>
+      <span class="brand">ESF Nova Esperança</span>
       <nav class="site-nav">
         <a href="#servicos">Serviços</a>
         <a href="#agendar" class="nav-cta">Agendar</a>
@@ -50,7 +50,7 @@
       <div class="wrap info-grid">
         <div class="info-item">
           <span class="info-label">Endereço</span>
-          <p>Rua Francelino Queiroz, SN — Bairro Centro</p>
+          <p>Rua das Acácias, 245 — Bairro Nova Esperança</p>
         </div>
         <div class="info-item">
           <span class="info-label">Horário de funcionamento</span>
@@ -71,26 +71,31 @@
           <article class="service-row" style="--service-accent: var(--color-teal)">
             <h3>Consulta médica</h3>
             <p>Atendimento clínico geral com o médico da equipe, para queixas, acompanhamento e renovação de receitas.</p>
+            <p class="service-horario">Segunda a quarta, das 7h às 11h e das 13h às 17h.</p>
           </article>
 
           <article class="service-row" style="--service-accent: var(--color-blue)">
             <h3>Pré-natal</h3>
             <p>Acompanhamento da gestação em todas as fases, com a equipe de enfermagem e medicina da família.</p>
+            <p class="service-horario">Quinta-feira, das 7h às 11h e das 13h às 17h.</p>
           </article>
 
           <article class="service-row" style="--service-accent: var(--color-ochre)">
             <h3>Vacinação</h3>
             <p>Aplicação de vacinas do calendário nacional, para todas as idades.</p>
+            <p class="service-horario">Segunda a sexta, das 7h às 17h.</p>
           </article>
 
           <article class="service-row" style="--service-accent: var(--color-teal)">
             <h3>Puericultura</h3>
-            <p>Acompanhamento do crescimento e desenvolvimento de crianças de 0 a 2 anos.</p>
+            <p>Acompanhamento do crescimento e desenvolvimento de crianças de 0 a 5 anos.</p>
+            <p class="service-horario">Terça e quinta-feira, das 7h às 11h e das 13h às 17h.</p>
           </article>
 
           <article class="service-row" style="--service-accent: var(--color-blue)">
             <h3>Visita domiciliar</h3>
             <p>Visita da equipe na sua casa, para quem tem dificuldade de locomoção até a unidade.</p>
+            <p class="service-horario">Sexta-feira, das 8h às 13h.</p>
           </article>
         </div>
       </div>
@@ -122,6 +127,7 @@
               <option value="puericultura">Puericultura</option>
               <option value="visita_domiciliar">Visita domiciliar</option>
             </select>
+            <p class="field-hint" id="horario-info"></p>
           </div>
 
           <div class="field-row">
@@ -154,7 +160,7 @@
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <p>ESF Saude e o que Interessa — projeto fictício, criado como teste técnico.</p>
+      <p>ESF Nova Esperança — projeto fictício, criado como teste técnico.</p>
       <a href="login.html">Acesso administrativo</a>
     </div>
   </footer>
