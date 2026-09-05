@@ -1,336 +1,151 @@
-<img src="logo.png" alt="Mupi Systems Logo" width="200"/>
+# Agendamento ESF Saúde é o que Interessa
 
-# Estágio em Tecnologia - Desenvolvimento Full Stack
 
-## Sobre o teste
 
-Bem-vindo(a) ao teste técnico para a vaga de Estágio em Tecnologia - Desenvolvimento Full Stack na Mupi Systems!
+## Visão geral
 
-### O que você vai construir?
+Este é um sistema de agendamento para uma Unidade de Saúde da Família (ESF) fictícia, chamada **ESF Saúde é o que Interessa **. Ele tem duas frentes:
 
-Um sistema web com três partes:
+- **Uma página pública**, onde qualquer visitante pode conhecer a unidade e solicitar um agendamento (consulta médica, pré-natal, vacinação, puericultura ou visita domiciliar).
+- **Um painel administrativo**, protegido por login, onde a equipe da unidade visualiza e gerencia as solicitações que chegam.
 
-1. **Uma página pública**: apresenta um negócio ou projeto de sua escolha e tem um formulário
-2. **Registros no banco**: o que chega pelo formulário é salvo com status "pendente"
-3. **Um painel de gestão**: onde o admin faz login e visualiza tudo que chegou
+Toda solicitação enviada pelo formulário público nasce com status **pendente**. É a equipe, dentro do painel, que confirma ou cancela cada uma.
 
-E sobre o quê? Isso é 100% seu. Agendamento numa barbearia, inscrição num curso, pedido de orçamento numa assistência técnica, reserva de mesa num restaurante, pedido de adoção numa ONG de animais... qualquer coisa em que alguém de fora envia uma solicitação e alguém de dentro gerencia o que chega.
+### Por que esse tema
 
-Essa liberdade não é enfeite: criatividade é o nosso maior critério de avaliação. Tanto na forma de resolver o problema quanto nas escolhas que você faz pelo caminho.
+Escolhi o contexto de uma ESF porque é uma realidade que conheço de perto,tenho experiência como agente comunitária de saúde, o que me deu uma noção concreta de como esse fluxo de agendamento funciona na prática: os tipos de atendimento mais comuns, os campos que realmente importam num registro, e as situações do dia a dia que um sistema desse tipo precisa suportar.
 
-Ao longo deste documento vamos chamar essa solicitação de "registro". No seu projeto, dê a ela o nome do seu tema: agendamento, inscrição, pedido, reserva, o que for.
+## Funcionalidades
 
-### Como funciona?
+### Página pública (`index.html`)
 
-**Visitante**: acessa a página pública, preenche o formulário e envia. O registro é salvo no banco como "pendente".
+- Apresentação da unidade (endereço, horário de funcionamento, telefone) e dos serviços oferecidos
+- Formulário de agendamento com nome, email, tipo de atendimento, data e horário
+- Validação dos campos antes do envio
+- Confirmação visual na própria página após o envio (o formulário é substituído por uma mensagem de confirmação, sem usar `alert()`)
+- Layout responsivo, testado em telas de celular e desktop
 
-**Administrador**: acessa a rota do painel, faz login e vê a lista de registros ordenada por data (nome, email, data, status...).
+### Autenticação (`login.html`)
 
-### O que esperamos?
+- Login de administrador via email e senha, usando a autenticação pronta do Supabase (Supabase Auth)
+- Se a pessoa já estiver logada e tentar acessar a tela de login, é redirecionada direto para o painel
+- Mensagem de erro clara quando as credenciais estão erradas, sem travar a tela
 
-- Que funcione aquilo que você entregou
-- Código que você entende e consegue explicar
-- Decisões conscientes registradas, inclusive as decisões de não fazer algo
-- Pelo menos uma coisa que a gente não pediu (pode ser pequena!)
-- Interface com a cara do tema escolhido, responsiva e limpa
-- README que faz o projeto rodar sem você por perto
+### Painel administrativo (`painel.html`)
 
-### E antes de tudo: não precisa estar completo
+- **Protegido de verdade**: ao carregar, a página verifica se existe uma sessão válida antes de buscar qualquer dado. Sem sessão, a pessoa é redirecionada para o login,inclusive quando tenta acessar a URL do painel diretamente, sem passar pelo login
+- Lista todos os agendamentos, ordenados por data e horário
+- Status de cada agendamento em destaque, com cores diferentes (badge) para pendente, confirmado e cancelado
+- Três estados tratados na tela: carregando, lista vazia ("nenhum agendamento ainda") e erro de conexão
+- **Funcionalidade extra**: o admin consegue mudar o status de um agendamento (pendente → confirmado ou cancelado) direto na lista, sem precisar de outra tela
+- **Funcionalidade extra**: filtro por tipo de atendimento, para facilitar quando a lista crescer
+- Logout funcional, e a sessão é monitorada em tempo real: se expirar ou for encerrada em outra aba, a pessoa é levada de volta ao login automaticamente
 
-Entrega parcial é entrega. Avaliamos o que você fez, não o tamanho do que faltou.
+## Modelo de dados
 
-O que mais pesa aqui é como você pensa: como prioriza, o que percebe, como decide quando falta tempo ou informação. E isso aparece tão bem numa entrega parcial bem explicada quanto numa completa.
+A tabela `agendamentos` guarda cada solicitação com os seguintes campos:
 
-Se em algum momento a lista abaixo parecer grande demais, leia a seção [E se não der tempo de fazer tudo?](#e-se-não-der-tempo-de-fazer-tudo) antes de desistir.
+| Campo | Tipo | Observação |
+|---|---|---|
+| `id` | uuid | Gerado automaticamente |
+| `nome` | text | Nome de quem solicitou |
+| `email` | text | Email de quem solicitou |
+| `tipo` | text | Um dos 5 valores fixos: `consulta_medica`, `pre_natal`, `vacinacao`, `puericultura`, `visita_domiciliar` |
+| `data` | date | Data desejada para o atendimento |
+| `horario` | time | Horário desejado |
+| `status` | text | `pendente` (padrão ao criar), `confirmado` ou `cancelado` |
+| `criado_em` | timestamptz | Preenchido automaticamente na criação |
 
-## A stack é sua escolha
+O detalhamento completo (constraints, índices, políticas) está em [`sql/schema.sql`](./sql/schema.sql).
 
-Não vamos dizer qual tecnologia usar. Você decide, e essa decisão faz parte da avaliação.
+## Como o sistema protege os dados
 
-Laravel, Rails, Express, FastAPI, Next.js, Django, Spring, .NET, Go, Flask... tanto faz. Renderizado no servidor ou SPA, tanto faz. Postgres, MySQL, Mongo ou um SQLite num arquivo, tanto faz.
+Duas camadas trabalham juntas:
 
-### Um conselho antes de escolher
+1. **No front-end**: o `painel.js` verifica se existe uma sessão antes de mostrar qualquer coisa, e redireciona para o login se não houver.
+2. **No banco de dados (a proteção que realmente importa)**: o Supabase usa Row Level Security (RLS). As políticas definidas em `sql/schema.sql` garantem que:
+   - Visitantes anônimos só conseguem **inserir** um novo agendamento — não conseguem ler nem alterar nada, mesmo tentando acessar a API do Supabase diretamente, sem passar pelo site.
+   - Apenas administradores autenticados conseguem **ler** e **atualizar** os registros.
 
-Escolha o que você já conhece. Este não é um teste de aprender stack nova do zero. Escolher algo desconhecido só para impressionar costuma dar errado, e aparece na conversa. Ferramenta que você domina vale mais que ferramenta da moda.
+Ou seja, mesmo que alguém tentasse burlar a tela do painel, o próprio banco de dados barra o acesso.
 
-### O que a escolha precisa entregar
+## Stack utilizada
 
-Seja qual for a stack:
+- **Front-end:** HTML, CSS e JavaScript puro — sem framework, sem processo de build
+- **Back-end, banco de dados e autenticação:** [Supabase](https://supabase.com) (Postgres + Auth + API REST autogerada)
 
-- Roda na máquina de outra pessoa seguindo só o seu README
-- Autenticação pronta é permitida (Auth.js, Supabase, Devise, Passport, a do seu framework...). O que não vale é não saber explicar o que ela faz
-- O sistema é desenvolvido por você, não montado num serviço pronto (Calendly, Google Forms...)
-- Repositório com histórico de commits
+O raciocínio completo por trás dessa escolha está em [`DECISOES.md`](./DECISOES.md).
 
-No `DECISOES.md`, conte por que escolheu essa stack: o que você ganhou e o que perdeu com a escolha.
+## Estrutura do projeto
 
-## Objetivos
+```
+├── index.html              # Página pública: apresentação da ESF + formulário
+├── login.html                # Tela de login do admin
+├── painel.html                 # Painel de gestão (rota protegida)
+├── css/
+│   ├── style.css                 # Estilos da página pública
+│   └── painel.css                  # Estilos do login e do painel
+├── js/
+│   ├── supabaseClient.js             # Conexão com o projeto Supabase
+│   ├── app.js                          # Envio do formulário público
+│   ├── auth.js                           # Lógica do login
+│   └── painel.js                           # Listagem, filtro, status e logout do painel
+└── sql/
+    └── schema.sql                          # Criação da tabela e das políticas de RLS
+```
 
-- Desenvolver uma página pública com formulário funcional
-- Visualizar os registros recebidos em um painel de gestão protegido por login
-- Demonstrar que você consegue ler uma especificação e traduzi-la em código
-- Mostrar capacidade de decidir sob ambiguidade e de organizar código
-- Criar uma interface responsiva e funcional
+## Como rodar o projeto localmente
 
-## Instruções
+### Pré-requisitos
 
-### Fork do repositório
+- Um navegador atualizado (Chrome, Edge, Firefox...)
+- [VS Code](https://code.visualstudio.com/) com a extensão **Live Server** (ou qualquer outro servidor estático — o projeto não usa Node.js nem build)
+- Uma conta gratuita no [Supabase](https://supabase.com)
 
-1. Faça um fork deste repositório para sua conta pessoal do GitHub
-2. Trabalhe no seu próprio fork
+### 1. Clone o repositório
 
-### Implementação
+```bash
+git clone https://github.com/Fabia13/projeto_estagio_2026_2.git
+cd projeto_estagio_2026_2
+```
 
-Desenvolva o projeto conforme os requisitos abaixo, no tema e na stack que você escolher.
+### 2. Crie um projeto no Supabase
 
-### Submissão
+Acesse [supabase.com](https://supabase.com), crie uma conta gratuita e um novo projeto. Espere de 1 a 2 minutos até ele terminar de ser provisionado.
 
-1. Após finalizar, abra um Pull Request do seu fork para o repositório original
-2. Na descrição do PR, inclua:
-   - O que você adicionou além do que foi pedido, e por quê
-   - O que você decidiu não fazer, e por quê
-   - Onde você teve dificuldade
-3. Aguarde o agendamento da reunião para avaliação do teste
+### 3. Rode o schema do banco
 
-### Documentação
+No painel do Supabase, abra o **SQL Editor**, cole todo o conteúdo de [`sql/schema.sql`](./sql/schema.sql) e clique em **Run**. Isso cria a tabela `agendamentos` já com as políticas de segurança descritas acima.
 
-Dois arquivos no repositório:
+### 4. Crie o usuário administrador
 
-| Arquivo | Conteúdo |
-|---------|----------|
-| `README.md` | Descrição do projeto, stack utilizada e passo a passo para rodar |
-| `DECISOES.md` | Suas decisões (incluindo tema e stack) e como você usou IA |
+Em **Authentication > Users > Add user > Create new user**, defina um email e senha — essas serão as credenciais para entrar no painel pelo `login.html`. Marque **Auto Confirm User**, se essa opção aparecer.
 
-O `DECISOES.md` pode ser curto. Uma página inteira já é mais do que precisamos. Queremos clareza, não volume.
+### 5. Configure as credenciais do projeto
 
-## Requisitos funcionais
+Em **Project Settings > API**, copie a **Project URL** e a chave **anon public** (nunca a `service_role`, que é secreta). Abra `js/supabaseClient.js` e preencha:
 
-Descritos por comportamento, não por tecnologia. Como implementar é com você.
+```js
+const SUPABASE_URL = "sua-project-url-aqui";
+const SUPABASE_ANON_KEY = "sua-anon-key-aqui";
+```
 
-### Dados
+> A chave `anon` é pública por natureza do Supabase — quem protege os dados de verdade são as políticas de RLS do passo 3, não o sigilo dessa chave.
 
-Um registro precisa guardar:
+### 6. Rode o projeto
 
-| Campo | Observação |
-|-------|------------|
-| **nome** | Nome de quem preencheu o formulário |
-| **email** | Email de quem preencheu |
-| **tipo** | Valor restrito a uma lista de pelo menos 3 opções, definidas por você conforme o tema (serviços, turmas, tipos de pedido...) |
-| **data** | Uma data que faça sentido no seu tema: data do agendamento, do evento, da reserva, prazo desejado... |
-| **horário** | Se fizer sentido no tema. Um agendamento tem horário; um pedido de orçamento talvez não. Se não tiver, troque por outro campo que o seu tema pedir |
-| **status** | Restrito a: `pendente`, `confirmado`, `cancelado`. Nasce sempre como `pendente` |
-| **criado_em** | Quando o registro foi criado |
+Abra `index.html` com o Live Server do VS Code (clique direito no arquivo → "Open with Live Server"). As três páginas ficam acessíveis em:
 
-Os nomes dos campos são seus: em português, em inglês, camelCase, o que a sua stack pedir. O que importa é a informação estar lá.
+- Página pública: `index.html`
+- Login do admin: `login.html`
+- Painel (exige login): `painel.html`
 
-### Comportamentos
+## Problemas comuns
 
-| # | O que precisa acontecer |
-|---|--------------------------|
-| 1 | Visitante acessa a página pública e vê informações do negócio/projeto e as opções oferecidas |
-| 2 | Visitante envia o formulário e o registro é persistido com status `pendente` |
-| 3 | Visitante recebe confirmação visual de que o envio deu certo |
-| 4 | Visitante que tenta acessar o painel sem estar autenticado é barrado e enviado para o login |
-| 5 | Admin faz login com credenciais válidas e chega no painel |
-| 6 | Painel lista todos os registros, ordenados por data, com o status de cada um visível |
-| 7 | Admin consegue encerrar a sessão (logout) |
+**Erro `PGRST125: Invalid path specified in request URL`** ao enviar o formulário ou carregar o painel: normalmente significa que a `SUPABASE_URL` em `js/supabaseClient.js` foi copiada errada — por exemplo, com `/rest/v1/` no final (essa parte a biblioteca já adiciona sozinha) ou com uma barra `/` sobrando. A URL deve ser só o domínio base, algo como `https://xxxxx.supabase.co`, sem nada depois.
 
-O item 4 é o que mais gente esquece de testar. Abra uma aba anônima e tente acessar o painel direto pela URL.
+**O painel não mostra nada e fica preso em "Carregando":** confira se o `schema.sql` foi executado com sucesso no SQL Editor e se o usuário admin foi criado em Authentication.
 
-### Interface
+## Decisões técnicas
 
-- Design responsivo (mobile e desktop)
-- Status de cada registro visualmente identificável no painel (ex: badge colorida)
-
-#### Sobre CSS
-
-Use o que quiser: Tailwind (via CDN, uma linha no `<head>`), CSS puro, a biblioteca de componentes da sua stack, o que for. Só não gaste tempo configurando toolchain. Batalhar com build de CSS não é o que estamos avaliando, então escolha o caminho mais curto até o resultado visual.
-
-### Qualidade de código
-
-- Código organizado e legível
-- Estrutura de projeto coerente com as convenções da stack escolhida
-- README com instruções claras
-
-## O que a especificação não diz
-
-Esta especificação deixa espaço em aberto de propósito, e cada tema cria as próprias perguntas. Um exemplo que vale para qualquer tema: como fica o painel quando ainda não chegou nenhum registro? Outras vão aparecer conforme o que você escolher construir.
-
-Você não precisa resolver tudo que encontrar. Precisa perceber que existe e registrar o que decidiu. Duas ou três linhas por item, no `DECISOES.md`, já valem nota cheia.
-
-## Além do mínimo
-
-Os requisitos acima são o piso. Entregar tudo que foi pedido, bem feito, já é uma boa entrega. O que faz a gente lembrar de você é o que vem além. E "além" aqui é algo pequeno, não é outro projeto.
-
-### 1. Escolha 2 ou 3 melhorias e faça bem feito
-
-Três coisas caprichadas valem mais que dez pela metade. Lista longa com acabamento zero conta contra, não a favor.
-
-### 2. Adicione pelo menos uma coisa que não pedimos
-
-Você é o desenvolvedor do produto. Olhe para a tela de quem vai gerenciar isso e pergunte: o que falta aqui para ser realmente usável na segunda-feira de manhã?
-
-Pode ser simples. Implemente e explique no PR por que aquilo importa.
-
-### 3. Diga o que você decidiu não fazer
-
-Liste no PR o que ficou de fora de propósito e o motivo. Saber cortar escopo vale tanto quanto saber implementar.
-
-<details>
-<summary><b>Sem ideias do que fazer a mais? (abra só se precisar)</b></summary>
-
-Coisas que costumam fazer sentido nesse tipo de sistema. Não é um checklist: se você só executar essa lista, o resultado é o de todo mundo.
-
-- Visual atraente: cores e tipografia harmoniosas, com a "cara" do tema escolhido
-- Confirmar/cancelar registros: ações no painel para mudar o status
-- Validação de formulários, no frontend e no backend
-- Evitar conflitos: impedir dois registros no mesmo horário, na mesma vaga, o que valer no seu tema
-- Feedback visual: mensagem de sucesso após enviar e nas ações do painel
-- Interatividade sem recarregar a página, via a abordagem da sua stack
-- Filtros ou busca por status, data ou nome
-- Campos adicionais: telefone, observações, etc.
-- Paginação na listagem
-- Resumo no painel: contadores (total de pendentes, confirmados hoje...)
-
-</details>
-
-## Critérios de avaliação
-
-Vale repetir o que já dissemos lá em cima: o que mais avaliamos é criatividade. No tema, na solução, nos detalhes que você escolhe cuidar. Os critérios abaixo existem para dar chão a isso.
-
-### O básico: o que esperamos ver de pé
-
-- Formulário salva o registro no banco
-- Painel lista os registros ordenados por data, com o status visível
-- Login protege o painel
-- O projeto roda seguindo o seu próprio README, sem passo faltando
-
-Fechou esses quatro? Você fez o teste. O que vem abaixo é o que diferencia uma entrega da outra.
-
-Não fechou algum? Não é eliminatório. Conte no PR o que ficou faltando e por quê. O raciocínio conta.
-
-### Desempate: o que faz a gente lembrar de você
-
-| O que olhamos | Como aparece na prática |
-|---------------|--------------------------|
-| Criatividade | O tema, a solução e os detalhes têm a sua cara, não a cara de um tutorial |
-| Julgamento | Percebeu as ambiguidades da especificação e decidiu conscientemente |
-| Escolha de ferramenta | A stack faz sentido para o problema e você sabe dizer por que escolheu |
-| Iniciativa | Adicionou algo que não pedimos e soube dizer por que importa |
-| Priorização | Cortou escopo de propósito e explicou o corte |
-| Domínio | Entende o que entregou e consegue conversar sobre o próprio código |
-| Cuidado | Página com a cara do tema, estados vazios tratados, responsivo testado no celular |
-| Comunicação | README claro, PR bem escrito, commits que contam a história do trabalho |
-
-Não avaliamos qual tema nem qual stack você escolheu. Avaliamos se as escolhas foram conscientes e se você domina o que escolheu.
-
-## Diretrizes criativas
-
-### Página pública
-
-Liberdade criativa total: escolha qualquer tema em que uma pessoa envia uma solicitação e um admin gerencia, real ou fictício.
-
-Alguns exemplos, só para destravar:
-
-- Barbearia ou salão: agendamento de horário
-- Clínica (médica, odontológica, fisioterapia...): agendamento de consulta
-- Curso, workshop ou aula experimental: inscrição
-- Assistência técnica ou marcenaria: pedido de orçamento
-- Restaurante ou espaço de eventos: reserva
-- ONG de animais: pedido de adoção
-- Estúdio fotográfico: agendamento de ensaio
-- Ou qualquer outra combinação que você inventar
-
-A estrutura da página é livre. Poucas seções bem feitas valem mais que muitas espremidas, e não precisa ser uma landing page de agência.
-
-### Painel de gestão
-
-Um painel próprio para visualizar os registros, com acesso controlado por autenticação.
-
-#### O fluxo que precisa funcionar
-
-1. Visitante acessa a rota do painel
-2. Como não está autenticado, é redirecionado para a tela de login
-3. Admin faz login com credenciais válidas
-4. É levado ao painel
-5. Vê todos os registros, ordenados por data
-6. Consegue sair da sessão quando quiser
-
-#### O que você precisa montar
-
-| Peça | O que faz |
-|------|-----------|
-| Usuário admin | Um usuário com acesso ao painel. Documente no README como criá-lo |
-| Tela de login | Formulário de autenticação. Pode ser simples, não avaliamos o design dela |
-| Proteção da rota | Sem sessão válida, o painel não abre. Nem pela URL direta |
-| Logout | Um jeito de encerrar a sessão |
-| Listagem | Os campos do registro, com status visível, ordenados por data. Aqui vale caprichar |
-
-Use a autenticação pronta da sua stack. Reinventar login do zero não impressiona ninguém. O que queremos ver é você sabendo usar e explicar a que já existe.
-
-## Rodando o projeto
-
-Como o seu projeto sobe depende da stack que você escolheu, então quem escreve essa parte é você, no README do seu repositório.
-
-O critério é simples, e a gente vai testar de verdade: uma pessoa que nunca viu seu projeto consegue clonar, seguir o seu README e ver a aplicação funcionando no navegador?
-
-Na prática, isso costuma significar cobrir:
-
-- Pré-requisitos (versão de linguagem, runtime, banco de dados...)
-- Instalação das dependências
-- Variáveis de ambiente, se houver (inclua um `.env.example`)
-- Preparo do banco (migrations, seed...)
-- Como criar o usuário admin
-- Como subir a aplicação e em qual endereço ela responde
-
-O passo do usuário admin é o que mais falta nas entregas. Se a gente não conseguir entrar no painel, metade do teste fica invisível. Vale testar seu próprio README numa pasta limpa antes de enviar.
-
-## Notas importantes
-
-- Funcionar é pré-requisito. O diferencial é o cuidado e as decisões
-- Se a lista parecer grande, corte, e conte no PR o que cortou e por quê
-- Queremos ver o processo: commits incrementais com mensagens que fazem sentido valem mais que um único commit "projeto final"
-- Documentação, Stack Overflow, IA: tudo liberado. Veja a seção sobre IA abaixo
-- Simples e bem feito é melhor que complexo e quebrado
-
-## E se não der tempo de fazer tudo?
-
-Está tudo bem. Sério.
-
-Entregue do jeito que estiver e conte no Pull Request:
-
-- O que você conseguiu fazer
-- Onde travou, e o que tentou antes de travar
-- O que faria diferente com mais tempo
-
-Avaliamos o que você fez, não o tamanho do que faltou. Um projeto com metade dos requisitos e um raciocínio claro por trás das escolhas vale mais, para nós, do que um projeto completo que o candidato não sabe explicar.
-
-E vale repetir, porque é o que mais importa: o que estamos avaliando é a forma como você pensa. Como você prioriza, o que percebe, como decide quando falta tempo ou informação. Isso aparece igualmente bem numa entrega parcial. Às vezes até melhor, porque é justamente ao priorizar que a cabeça de alguém fica visível.
-
-O único cenário ruim é não entregar. Se você chegou até aqui, abra o PR. 😊
-
-## Sobre o uso de IA
-
-Assumimos que você vai usar IA. Nós usamos. Não tem problema nenhum nisso.
-
-Mas isso muda o que estamos avaliando. Se a IA escreve o CRUD em 20 minutos, o CRUD não diz nada sobre você. O que diz é o que você faz depois: o que percebeu que faltava, o que recusou da sugestão dela, e o que decidiu por conta própria.
-
-### No seu `DECISOES.md`
-
-Além das decisões técnicas, inclua uma seção curta sobre IA respondendo:
-
-1. O que você delegou para a IA e o que fez à mão, e por quê
-2. Uma vez em que a IA te deu algo ruim ou errado: o que era, como você percebeu, e o que fez no lugar
-3. Uma decisão que você tomou contra a sugestão da IA, e o motivo
-
-A pergunta 2 é a que mais nos interessa. Quem usa IA de verdade sempre tem essa história. Quem só copia e cola, não tem.
-
-Três parágrafos curtos resolvem. Não precisa de mais que isso.
-
-### E depois, na conversa
-
-Vamos conversar sobre o que você construiu: por que fez de um jeito e não de outro, o que te deu trabalho, o que você mudaria. Não é sabatina. É a mesma conversa que temos entre a gente quando alguém abre um PR.
-
-Por isso vale entregar código que você entende. Não porque vamos cobrar linha por linha, mas porque essa conversa é a parte mais interessante do processo, e é onde você tem mais espaço para mostrar como pensa.
-
-Boa sorte! A gente se vê na conversa.
+O raciocínio por trás do tema, da stack, das ambiguidades da especificação e do uso de IA no desenvolvimento está documentado em [`DECISOES.md`](./DECISOES.md).
