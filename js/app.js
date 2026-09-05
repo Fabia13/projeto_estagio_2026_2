@@ -51,11 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) {
       console.error("Erro ao salvar agendamento:", error);
 
-      // Código 23505 = violação de restrição única no banco: já existe
-      // um agendamento não cancelado desse mesmo tipo, nessa mesma
-      // data e horário (tipos diferentes não conflitam entre si).
-      if (error.code === "23505") {
-        mostrarErro("Esse horário já está reservado para esse tipo de atendimento. Escolha outra data ou horário.");
+      // 23505 = restrição única violada / 23P01 = restrição de exclusão
+      // violada (a regra de espaçamento mínimo de 30 minutos entre
+      // agendamentos do mesmo tipo). Nos dois casos, o horário
+      // escolhido conflita com outro já existente.
+      if (error.code === "23505" || error.code === "23P01") {
+        mostrarErro("Esse horário está muito próximo de outro agendamento já existente para esse tipo de atendimento (mínimo 30 minutos de intervalo). Escolha outro horário.");
       } else {
         mostrarErro("Não foi possível enviar sua solicitação agora. Tente novamente em instantes.");
       }
