@@ -29,6 +29,14 @@ create table if not exists agendamentos (
 -- Índice para acelerar a ordenação do painel por data
 create index if not exists agendamentos_data_idx on agendamentos (data, horario);
 
+-- Impede dois agendamentos na mesma data e horário (evita choque de
+-- horário mesmo se dois formulários forem enviados ao mesmo tempo).
+-- Cancelados não contam para essa regra: se um horário foi liberado
+-- por cancelamento, outra pessoa pode ocupá-lo.
+create unique index if not exists agendamentos_sem_choque_idx
+  on agendamentos (data, horario)
+  where status <> 'cancelado';
+
 -- Habilita Row Level Security (obrigatório para controlar quem lê/escreve o quê)
 alter table agendamentos enable row level security;
 
